@@ -5,7 +5,9 @@ namespace SMARTbusiness.TestTask.Application.Database;
 
 public class AppDbContext : DbContext
 {
-    public required DbSet<EquipmentPlacementContract> EquipmentPlacementContracts { get; set; }    
-    public required DbSet<ProcessEquipmentType> ProcessEquipmentTypes { get; set; }    
-    public required DbSet<ProductionFacility> ProductionFacilities { get; set; }    
+    public DbSet<EquipmentPlacementContract> EquipmentPlacementContracts { get; set; }    
+    public DbSet<ProcessEquipmentType> ProcessEquipmentTypes { get; set; }    
+    public DbSet<ProductionFacility> ProductionFacilities { get; set; }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 }
