@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMARTbusiness.TestTask.Domain", "SMARTbusiness.TestTask.Domain\SMARTbusiness.TestTask.Domain.csproj", "{CCAB30C8-6143-4307-B214-996212FD2E7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMARTbusiness.TestTask.Application", "SMARTbusiness.TestTask.Application\SMARTbusiness.TestTask.Application.csproj", "{DF03851C-6AF9-4422-AE60-D3C0A94E49B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{CCAB30C8-6143-4307-B214-996212FD2E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCAB30C8-6143-4307-B214-996212FD2E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCAB30C8-6143-4307-B214-996212FD2E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF03851C-6AF9-4422-AE60-D3C0A94E49B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF03851C-6AF9-4422-AE60-D3C0A94E49B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF03851C-6AF9-4422-AE60-D3C0A94E49B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF03851C-6AF9-4422-AE60-D3C0A94E49B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

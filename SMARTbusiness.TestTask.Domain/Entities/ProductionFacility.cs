@@ -5,7 +5,7 @@ namespace SMARTbusiness.TestTask.Domain.Entities;
 
 public class ProductionFacility : Entity
 {
-    public required Code Code { get; set; }
+    public required ProductionFacilityCode Code { get; set; }
     public required string Name { get; set; }
     public required decimal StandardArea { get; set; }
 

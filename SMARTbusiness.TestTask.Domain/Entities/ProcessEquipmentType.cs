@@ -5,7 +5,7 @@ namespace SMARTbusiness.TestTask.Domain.Entities;
 
 public class ProcessEquipmentType : Entity
 {
-    public required Code Code { get; set; }
+    public required ProcessEquipmentTypeCode Code { get; set; }
     public required string Name { get; set; }
     public required decimal Area { get; set; }
 }
