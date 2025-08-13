@@ -1,5 +1,5 @@
-using System.Diagnostics.Contracts;
-using FluentResults;
+using ErrorOr;
+using Hangfire;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,14 +13,17 @@ public class ContractsService : IContractsService
 {
     private readonly AppDbContext _dbContext;
     private readonly ILogger<ContractsService> _logger;
+    private readonly IBackgroundJobClient _backgroundJobClient;
 
-    public ContractsService(AppDbContext dbContext, ILogger<ContractsService> logger)
+    public ContractsService(AppDbContext dbContext, ILogger<ContractsService> logger, 
+        IBackgroundJobClient backgroundJobClient)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _backgroundJobClient = backgroundJobClient;
     }
     
-    public async Task<Result<List<EquipmentPlacementContractDto>>> GetAllContracts()
+    public async Task<ErrorOr<List<EquipmentPlacementContractDto>>> GetAllContracts()
     {
         var contracts = await _dbContext
             .EquipmentPlacementContracts
@@ -29,17 +32,17 @@ public class ContractsService : IContractsService
             .ProjectToType<EquipmentPlacementContractDto>()
             .ToListAsync();
 
-        return Result.Ok(contracts);
+        return contracts;
     }
 
-    public async Task<Result> CreateNewContract(CreateNewContractDto createNewContractDto)
+    public async Task<ErrorOr<EquipmentPlacementContractDto>> CreateNewContract(CreateNewContractDto createNewContractDto)
     {
         var productionFacility = await _dbContext.ProductionFacilities
             .FirstOrDefaultAsync(x => x.Code == createNewContractDto.ProductionFacilityCode);
         if (productionFacility is null)
         {
             _logger.LogError("Production facility with Code={ProductionFacilityCode} was not found", createNewContractDto.ProductionFacilityCode);
-            return Result.Fail($"Production facility with Code={createNewContractDto.ProductionFacilityCode} was not found");
+            return Error.NotFound(description: $"Production facility with Code={createNewContractDto.ProductionFacilityCode} was not found");
         }
         
         var processEquipmentType = await _dbContext.ProcessEquipmentTypes
@@ -47,7 +50,7 @@ public class ContractsService : IContractsService
         if (processEquipmentType is null)
         {
             _logger.LogError("Process equipment type with Code={ProcessEquipmentTypeCode} was not found", createNewContractDto.ProcessEquipmentTypeCode);
-            return Result.Fail($"Process equipment type with Code={createNewContractDto.ProcessEquipmentTypeCode} was not found");
+            return Error.NotFound(description: $"Process equipment type with Code={createNewContractDto.ProcessEquipmentTypeCode} was not found");
         }
 
         var freeArea = productionFacility.StandardArea - _dbContext.EquipmentPlacementContracts
@@ -57,7 +60,7 @@ public class ContractsService : IContractsService
         if (freeArea < processEquipmentType.Area * createNewContractDto.EquipmentUnitsCount)
         {
             _logger.LogError("Not enough free area in the production facility to place the equipment");
-            return Result.Fail("Not enough free area in the production facility to place the equipment");
+            return Error.Failure(description: "Not enough free area in the production facility to place the equipment");
         }
 
         var newContract = new EquipmentPlacementContract
@@ -70,6 +73,15 @@ public class ContractsService : IContractsService
         await _dbContext.EquipmentPlacementContracts.AddAsync(newContract);
         await _dbContext.SaveChangesAsync();
 
-        return Result.Ok();
+        _backgroundJobClient.Enqueue(() => BackgroundWork(newContract.Id));
+
+        return newContract.Adapt<EquipmentPlacementContractDto>();
+    }
+
+    private void BackgroundWork(Guid id)
+    {
+        _logger.LogInformation("Background job: Contract {Id} created", id);
+        Task.Delay(2000).Wait();
+        _logger.LogInformation("Background job: Contract {Id} processing completed", id);
     }
 }

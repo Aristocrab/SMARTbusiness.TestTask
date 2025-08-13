@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -81,7 +82,9 @@ public class ContractsServiceTests
 
         dbContext.SaveChanges();
 
-        _contractsService = new ContractsService(dbContext, Substitute.For<ILogger<ContractsService>>());
+        _contractsService = new ContractsService(dbContext, 
+            Substitute.For<ILogger<ContractsService>>(), 
+            Substitute.For<IBackgroundJobClient>());
     }
 
     [Fact]
@@ -91,7 +94,7 @@ public class ContractsServiceTests
         var contracts = await _contractsService.GetAllContracts();
         
         // Assert
-        contracts.IsSuccess.ShouldBeTrue();
+        contracts.IsError.ShouldBeFalse();
         contracts.Value.ShouldNotBeEmpty();
     }
     
@@ -110,7 +113,7 @@ public class ContractsServiceTests
         var result = await _contractsService.CreateNewContract(newContractDto);
         
         // Assert
-        result.IsSuccess.ShouldBeTrue();
+        result.IsError.ShouldBeFalse();
     }
     
     [Fact]
@@ -128,7 +131,7 @@ public class ContractsServiceTests
         var result = await _contractsService.CreateNewContract(newContractDto);
         
         // Assert
-        result.IsSuccess.ShouldBeFalse();
+        result.IsError.ShouldBeTrue();
     }
     
     [Fact]
@@ -146,7 +149,7 @@ public class ContractsServiceTests
         var result = await _contractsService.CreateNewContract(newContractDto);
         
         // Assert
-        result.IsSuccess.ShouldBeFalse();
+        result.IsError.ShouldBeTrue();
     }
     
     [Fact]
@@ -164,6 +167,6 @@ public class ContractsServiceTests
         var result = await _contractsService.CreateNewContract(newContractDto);
         
         // Assert
-        result.IsSuccess.ShouldBeFalse();
+        result.IsError.ShouldBeTrue();
     }
 }

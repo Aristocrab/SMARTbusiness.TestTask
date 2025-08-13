@@ -1,7 +1,7 @@
-using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using SMARTbusiness.TestTask.Application.Dtos;
 using SMARTbusiness.TestTask.Application.Services;
+using SMARTbusiness.TestTask.WebApi.Extensions;
 
 namespace SMARTbusiness.TestTask.WebApi.Controllers;
 
@@ -19,12 +19,16 @@ public class ContractsController : ControllerBase
     [HttpGet("all")]
     public async Task<ActionResult<List<EquipmentPlacementContractDto>>> GetAllContracts()
     {
-        return await _contractsService.GetAllContracts().ToActionResult();
+        var result = await _contractsService.GetAllContracts();
+
+        return result.ToActionResult();
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult> CreateNewContract(CreateNewContractDto createNewContractDto)
+    public async Task<ActionResult<EquipmentPlacementContractDto>> CreateNewContract(CreateNewContractDto createNewContractDto)
     {
-        return await _contractsService.CreateNewContract(createNewContractDto).ToActionResult();
+        var result =  await _contractsService.CreateNewContract(createNewContractDto);
+        
+        return result.ToActionResult();
     }
 }
